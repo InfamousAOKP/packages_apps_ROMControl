@@ -8,6 +8,8 @@ import android.app.DialogFragment;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener
+import android.content.DialogInterface.OnMultiChoiceClickListener;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
@@ -28,6 +30,7 @@ import android.preference.Preference;
 import android.preference.PreferenceGroup;
 import android.preference.PreferenceScreen;
 import android.preference.Preference.OnPreferenceChangeListener;
+import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.TwoStatePreference;
 import android.provider.MediaStore;
 import android.provider.Settings;
@@ -112,6 +115,10 @@ public class UserInterface extends AOKPPreferenceFragment implements OnPreferenc
     private static final String WALLPAPER_NAME = "notification_wallpaper.jpg";
     private static final String BOOTANIMATION_USER_PATH = "/data/local/bootanimation.zip";
     private static final String BOOTANIMATION_SYSTEM_PATH = "/system/media/bootanimation.zip";
+    private static final String PIE_CONTROLS = "pie_controls";
+    private static final String PIE_GRAVITY = "pie_gravity";
+    private static final String PIE_MODE = "pie_mode";
+    private static final String PIE_SIZE = "pie_size";
 
     CheckBoxPreference mAllow180Rotation;
     CheckBoxPreference mAllow270Rotation;
@@ -143,6 +150,13 @@ public class UserInterface extends AOKPPreferenceFragment implements OnPreferenc
     private AnimationDrawable mAnimationPart2;
     private String mErrormsg;
     private String mBootAnimationPath;
+    private ListPreference mPieMode;
+    private ListPreference mPieSize;
+    private ListPreference mPieGravity;
+    private CheckBoxPreference mPieControls;
+
+    private Context mContext;
+    private int mAllowedLocations;
 
     private static ContentResolver mContentResolver;
     private Random mRandomGenerator = new SecureRandom();
@@ -266,6 +280,28 @@ public class UserInterface extends AOKPPreferenceFragment implements OnPreferenc
         mWakeUpWhenPluggedOrUnplugged.setChecked(Settings.System.getBoolean(mContentResolver,
                         Settings.System.WAKEUP_WHEN_PLUGGED_UNPLUGGED, true));
 
+        mPieControls = (CheckBoxPreference) findPreference(PIE_CONTROLS);
+        mPieControls.setChecked((Settings.System.getInt(mContext.getContentResolver(),
+                Settings.System.PIE_CONTROLS, 0) == 1));
+
+        mPieGravity = (ListPreference) prefSet.findPreference(PIE_GRAVITY);
+        int pieGravity = Settings.System.getInt(mContext.getContentResolver(),
+                Settings.System.PIE_GRAVITY, 3);
+        mPieGravity.setValue(String.valueOf(pieGravity));
+        mPieGravity.setOnPreferenceChangeListener(this);
+
+        mPieMode = (ListPreference) prefSet.findPreference(PIE_MODE);
+        int pieMode = Settings.System.getInt(mContext.getContentResolver(),
+                Settings.System.PIE_MODE, 2);
+        mPieMode.setValue(String.valueOf(pieMode));
+        mPieMode.setOnPreferenceChangeListener(this);
+
+        mPieSize = (ListPreference) prefSet.findPreference(PIE_SIZE);
+        String pieSize = Settings.System.getString(mContext.getContentResolver(),
+                Settings.System.PIE_SIZE);
+        mPieSize.setValue(pieSize != null && !pieSize.isEmpty() ? pieSize : "1");
+        mPieSize.setOnPreferenceChangeListener(this);
+
         // hide option if device is already set to never wake up
         if(!mContext.getResources().getBoolean(
                 com.android.internal.R.bool.config_unplugTurnsOnScreen)) {
@@ -342,6 +378,15 @@ public class UserInterface extends AOKPPreferenceFragment implements OnPreferenc
         } else {
             mCustomLabel.setSummary(mCustomLabelText);
         }
+
+        checkControls();
+    }
+
+    private void checkControls() {
+        boolean pieCheck = mPieControls.isChecked();
+        mPieGravity.setEnabled(pieCheck);
+        mPieMode.setEnabled(pieCheck);
+        mPieSize.setEnabled(pieCheck);
     }
 
     @Override
@@ -533,9 +578,14 @@ public class UserInterface extends AOKPPreferenceFragment implements OnPreferenc
                     ((TwoStatePreference) preference).isChecked());
         } else if (preference == mStatusBarHide) {
             boolean checked = ((CheckBoxPreference)preference).isChecked();
-            Settings.System.putBoolean(getActivity().getContentResolver(),
+            Settings.System.putBoolean(mContext.getContentResolver(),
                     Settings.System.STATUSBAR_HIDDEN, checked ? true : false);
             return true;
+        } else if (preference == mPieControls) {
+            Settings.System.putInt(mContext.getContentResolver(),
+                    Settings.System.PIE_CONTROLS,
+                    mPieControls.isChecked() ? 1 : 0);
+            checkControls();
         }
         return super.onPreferenceTreeClick(preferenceScreen, preference);
     }
@@ -957,9 +1007,24 @@ public class UserInterface extends AOKPPreferenceFragment implements OnPreferenc
         } else if (preference == mCrtMode) {
             int crtMode = Integer.valueOf((String) newValue);
             int index = mCrtMode.findIndexOfValue((String) newValue);
-            Settings.System.putInt(getActivity().getContentResolver(),
+            Settings.System.putInt(mContext.getContentResolver(),
                     Settings.System.SYSTEM_POWER_CRT_MODE, crtMode);
             mCrtMode.setSummary(mCrtMode.getEntries()[index]);
+            return true;
+        } else if (preference == mPieMode) {
+            int pieMode = Integer.valueOf((String) newValue);
+            Settings.System.putInt(getActivity().getContentResolver(),
+                    Settings.System.PIE_MODE, pieMode);
+            return true;
+        } else if (preference == mPieSize) {
+            float pieSize = Float.valueOf((String) newValue);
+            Settings.System.putFloat(getActivity().getContentResolver(),
+                    Settings.System.PIE_SIZE, pieSize);
+            return true;
+        } else if (preference == mPieGravity) {
+            int pieGravity = Integer.valueOf((String) newValue);
+            Settings.System.putInt(getActivity().getContentResolver(),
+                    Settings.System.PIE_GRAVITY, pieGravity);
             return true;
         }
         return false;

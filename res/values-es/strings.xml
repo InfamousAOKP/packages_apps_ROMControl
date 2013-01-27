@@ -822,6 +822,28 @@
     <string name="size_3_dp">3 dp</string>
     <string name="size_4_dp">4 dp</string>
 
+    <!-- Pie Control -->
+    <string name="pie_controls_title">Controles circulares</string>
+    <string name="pie_controls_summary">Permite la navegación y el reporte de estado en el modo de escritorio expandido</string>
+    <string name="pie_gravity_title">Ubicación de los controles</string>
+    <string name="pie_gravity_summary">Seleccionar la ubicación donde se encontrarán los controles circulares</string>
+    <string name="pie_gravity_top">Arriba</string>
+    <string name="pie_gravity_bottom">Abajo</string>
+    <string name="pie_gravity_right">Derecha</string>
+    <string name="pie_gravity_left">Izquierda</string>
+    <string name="pie_mode_title">Estilo de los controles</string>
+    <string name="pie_mode_summary">Selecciona el estilo de animación y adiciones de estado</string>
+    <string name="pie_mode_bare">Simple</string>
+    <string name="pie_mode_quick">Rápido</string>
+    <string name="pie_mode_default">Por defecto</string>
+    <string name="pie_mode_slow">Lento</string>
+    <string name="pie_size_title">Tamaño de los controles</string>
+    <string name="pie_size_summary">Define el tamaño de los controles circulares</string>
+    <string name="pie_size_small">Pequeño</string>
+    <string name="pie_size_large">Grande</string>
+    <string name="pie_size_gigantic">Gigante</string>
+
+
     <!-- LED Values -->
     <string name="time_0_seconds_off">apagar</string>
     <string name="time_0_2_seconds">.2 segundos</string>
