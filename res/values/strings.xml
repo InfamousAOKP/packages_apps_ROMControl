@@ -413,6 +413,10 @@
     <string name="menu_cancel">Cancel</string>
     <string name="menu_save">Save</string>
 
+    <!--- Lock clock -->
+    <string name="lock_clock_title">Clock widget</string>
+    <string name="lock_clock_summary">View or change how the \'cLock\' Home and Lock screen widgets will display</string>
+
     <!-- Toggle Strings to be called from device overlays -->
     <string name="toggle_airplane_mode">Airplane Mode</string>
     <string name="toggle_auto_rotate">Auto Rotate</string>
